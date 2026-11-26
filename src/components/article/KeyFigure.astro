@@ -1,0 +1,56 @@
+---
+// The one number that matters, next to its explanation (default slot).
+//  value:   text shown without JS / before counting ("51,5 %")
+//  count:   numeric target to count up to (51.5) — optional; dec/pre/suffix format it
+//  size:    'lg' (default) | 'md' for figures with a word ("3 días", "+500 mil")
+//  tone:    'fill' (white → yellow while scrolling, default) | 'accent' (yellow) | 'plain' (white)
+import Panel from './Panel.astro';
+
+interface Props {
+  value: string;
+  caption: string;
+  count?: number;
+  dec?: number;
+  pre?: string;
+  suffix?: string;
+  size?: 'lg' | 'md';
+  tone?: 'fill' | 'accent' | 'plain';
+}
+const { value, caption, count, dec, pre, suffix, size = 'lg', tone = 'fill' } = Astro.props;
+---
+<Panel class="key" pad="lg" reveal>
+  <div>
+    <span
+      class:list={['key__n', 'num', `key__n--${size}`, `key__n--${tone}`, { 'fill-num': tone === 'fill' }]}
+      data-count={count}
+      data-dec={dec}
+      data-pre={pre}
+      data-suffix={suffix}
+      set:html={value}
+    />
+    <span class="key__cap">{caption}</span>
+  </div>
+  <div class="key__text"><slot /></div>
+</Panel>
+
+<style>
+  :global(.key) {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center;
+    gap: 20px 36px;
+    margin: 36px 0 16px;
+  }
+  .key__n {
+    display: block; min-width: 4.4ch;
+    font: 800 clamp(52px, 7vw, 76px)/1 var(--font-display);
+    letter-spacing: -.04em;
+  }
+  .key__n--md { font-size: clamp(40px, 5.2vw, 54px); white-space: nowrap; }
+  .key__n--accent { color: var(--accent); }
+  .key__n--plain { color: var(--text-heading); }
+  .key__cap { display: block; margin-top: 10px; max-width: 210px; font-size: 13px; line-height: 1.45; color: var(--text-muted); }
+  :global(.prose) .key__text :global(p) { margin: 0; font-size: 17px; line-height: 1.7; }
+
+  @media (max-width: 820px) {
+    :global(.key) { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

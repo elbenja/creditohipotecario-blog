@@ -1,0 +1,14 @@
+---
+// Centered content column (max 1208px, 24px gutters).
+interface Props {
+  as?: 'div' | 'section' | 'main' | 'header' | 'footer';
+  class?: string;
+  [key: string]: unknown;
+}
+const { as: Tag = 'div', class: cls, ...rest } = Astro.props;
+---
+<Tag class:list={['container', cls]} {...rest}><slot /></Tag>
+
+<style>
+  .container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 var(--gutter); }
+</style>

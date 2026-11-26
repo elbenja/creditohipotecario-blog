@@ -1,0 +1,10 @@
+---
+// List of <CoverageItem> cards (what you protect → what to review → what to confirm).
+interface Props { label: string }
+const { label } = Astro.props;
+---
+<ul class="cov" aria-label={label} data-reveal data-stagger><slot /></ul>
+
+<style>
+  .cov { list-style: none; display: grid; gap: 12px; margin: 28px 0 16px; padding: 0; }
+</style>

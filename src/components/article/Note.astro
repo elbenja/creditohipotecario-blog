@@ -1,0 +1,23 @@
+---
+// Short clarification or warning with a rule on the left. Optional tag on top.
+import Label from '../ui/Label.astro';
+
+interface Props { tag?: string }
+const { tag } = Astro.props;
+---
+<aside class="note block-text" data-reveal>
+  {tag && <Label class="note__tag">{tag}</Label>}
+  <slot />
+</aside>
+
+<style>
+  .note {
+    margin: 16px 0;
+    padding: 16px 22px;
+    border-left: 2px solid var(--line-hover);
+    border-radius: 0 14px 14px 0;
+    background: var(--surface-sunken);
+  }
+  .note :global(.note__tag) { display: block; margin-bottom: 8px; }
+  :global(.prose) .note :global(p) { line-height: 1.65; }
+</style>

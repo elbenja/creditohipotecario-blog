@@ -1,0 +1,16 @@
+---
+// Color key for charts and bars. tone: 'base' (slate) | 'accent' (yellow).
+export interface LegendItem { label: string; tone?: 'base' | 'accent' }
+interface Props { items: LegendItem[]; class?: string }
+const { items, class: cls } = Astro.props;
+---
+<p class:list={['legend', 'num', cls]} aria-hidden="true">
+  {items.map((it) => <span><i class:list={{ accent: it.tone === 'accent' }}></i>{it.label}</span>)}
+</p>
+
+<style>
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 18px 0 0; font-size: 13px; line-height: 1.6; color: var(--text-muted); }
+  span { display: inline-flex; align-items: center; gap: 8px; }
+  i { width: 10px; height: 10px; border-radius: var(--radius-pill); background: var(--text-muted); }
+  i.accent { background: var(--accent); }
+</style>

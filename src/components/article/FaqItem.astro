@@ -1,0 +1,64 @@
+---
+// One question. `summary` is readable without opening; the slot is the full answer.
+interface Props {
+  question: string;
+  summary?: string;
+  open?: boolean;
+}
+const { question, summary, open = false } = Astro.props;
+const id = `qa-${Math.random().toString(36).slice(2, 8)}`;
+---
+<section class:list={['qa', { 'is-open': open }]}>
+  <h3 class="qa__h">
+    <button type="button" class="qa__btn" aria-expanded={String(open)} aria-controls={id}>
+      <span class="qa__q">{question}</span>
+      {summary && <span class="qa__s">{summary}</span>}
+      <i class="qa__x" aria-hidden="true"></i>
+    </button>
+  </h3>
+  <div class="qa__a" id={id}><div><div class="qa__in block-text"><slot /></div></div></div>
+</section>
+
+<style>
+  .qa { border-radius: var(--radius-item); background: var(--surface); border: 1px solid var(--line); transition: border-color var(--dur-3) var(--ease); }
+  .qa:hover, .qa.is-open { border-color: var(--line-strong); }
+  .qa__h { margin: 0; }
+  .qa__btn {
+    display: grid; grid-template-columns: minmax(0, 1fr) 36px; align-items: center;
+    gap: 4px 16px;
+    width: 100%;
+    padding: 20px 20px 20px 24px;
+    border: 0; border-radius: var(--radius-item);
+    background: none; color: var(--text-strong);
+    text-align: left;
+  }
+  .qa__q { font: 600 18px/1.35 var(--font-sans); color: var(--text-heading); }
+  .qa__s { grid-column: 1; font: 400 14.5px/1.45 var(--font-sans); color: var(--text-muted); }
+  .qa__x {
+    position: relative; grid-column: 2; grid-row: 1 / span 2;
+    width: 36px; height: 36px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-strong);
+    transition: background var(--dur-3) var(--ease), border-color var(--dur-3) var(--ease), color var(--dur-3) var(--ease);
+  }
+  .qa__x::before, .qa__x::after {
+    content: ''; position: absolute; left: 50%; top: 50%;
+    width: 12px; height: 2px; margin: -1px 0 0 -6px;
+    border-radius: 2px; background: currentColor;
+    transition: transform .42s var(--ease);
+  }
+  .qa__x::after { transform: rotate(90deg); }
+  .qa.is-open .qa__x::before, .qa.is-open .qa__x::after { transform: rotate(180deg); }
+  .qa__btn:hover .qa__x { background: var(--text-strong); border-color: var(--text-strong); color: var(--bg); }
+
+  .qa__a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .42s var(--ease); }
+  .qa.is-open .qa__a { grid-template-rows: 1fr; }
+  .qa__a > div { min-height: 0; overflow: hidden; visibility: hidden; opacity: 0; transition: opacity .3s var(--ease), visibility 0s linear .42s; }
+  .qa.is-open .qa__a > div { visibility: visible; opacity: 1; transition: opacity .42s var(--ease) .08s, visibility 0s; }
+  .qa__in { padding: 0 24px 22px; }
+
+  @media (max-width: 820px) {
+    .qa__btn { padding: 18px 16px 18px 20px; }
+    .qa__in { padding: 0 20px 20px; }
+  }
+</style>

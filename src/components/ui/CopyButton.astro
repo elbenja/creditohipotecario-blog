@@ -1,0 +1,64 @@
+---
+// Copies `text` to the clipboard, flips to a check + "copied" label, and shows a toast.
+import Button from './Button.astro';
+
+interface Props {
+  text: string;
+  label?: string;
+  doneLabel?: string;
+  toast?: string;
+  class?: string;
+}
+const { text, label = 'Copiar', doneLabel = 'Copiado', toast = 'Copiado', class: cls } = Astro.props;
+---
+<Button
+  variant="secondary"
+  icon="copy"
+  class:list={['copy-btn', cls]}
+  data-copy={text}
+  data-label={label}
+  data-done={doneLabel}
+  data-toast={toast}
+><span class="copy-btn__text">{label}</span></Button>
+
+<script>
+  import { showToast } from '../../scripts/toast';
+
+  async function write(txt: string) {
+    try {
+      await navigator.clipboard.writeText(txt);
+      return true;
+    } catch {
+      // Fallback for iframes / older browsers.
+      const t = document.createElement('textarea');
+      t.value = txt;
+      t.style.position = 'fixed';
+      t.style.opacity = '0';
+      document.body.appendChild(t);
+      t.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch { /* ignore */ }
+      t.remove();
+      return ok;
+    }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((btn) => {
+    const icon = btn.querySelector('.ic');
+    const text = btn.querySelector('.copy-btn__text');
+    let timer = 0;
+    btn.addEventListener('click', async () => {
+      if (!(await write(btn.dataset.copy ?? ''))) return;
+      btn.classList.add('is-done');
+      icon?.classList.replace('ic-copy', 'ic-check');
+      if (text) text.textContent = btn.dataset.done ?? '';
+      showToast({ message: btn.dataset.toast ?? '', icon: 'check' });
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        btn.classList.remove('is-done');
+        icon?.classList.replace('ic-check', 'ic-copy');
+        if (text) text.textContent = btn.dataset.label ?? '';
+      }, 2200);
+    });
+  });
+</script>

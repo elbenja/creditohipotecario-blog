@@ -1,0 +1,15 @@
+---
+// Micro-label: 11–12px, uppercase, +0.1em tracking, muted. Used for section kickers,
+// block tags ("Ejemplo"), "Fuentes", table heads, "En este artículo".
+interface Props {
+  as?: 'span' | 'p' | 'h2' | 'h3' | 'dt';
+  size?: 11 | 12;
+  class?: string;
+}
+const { as: Tag = 'span', size = 11, class: cls } = Astro.props;
+---
+<Tag class:list={['label', size === 12 && 'label--12', cls]}><slot /></Tag>
+
+<style>
+  .label--12 { font-size: 12px; }
+</style>

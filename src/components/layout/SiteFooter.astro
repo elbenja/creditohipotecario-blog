@@ -1,0 +1,21 @@
+---
+import { SITE } from '../../config/site';
+import Container from './Container.astro';
+---
+<footer class="foot">
+  <Container class="foot__in">
+    <span>© {new Date().getFullYear()} {SITE.name}</span>
+    <a href={SITE.rss}>RSS</a>
+  </Container>
+</footer>
+
+<style>
+  .foot { border-top: 1px solid var(--line); }
+  .foot :global(.foot__in) {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    min-height: 72px;
+    font-size: 13px; color: var(--text-muted);
+  }
+  a { color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
+  a:hover { color: #fff; }
+</style>

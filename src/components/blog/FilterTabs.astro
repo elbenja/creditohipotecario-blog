@@ -1,0 +1,54 @@
+---
+// Segmented pill tabs with counters. Purely presentational: each button carries
+// data-tab and its counter carries data-count-for, so a parent script can wire them.
+import Icon from '../ui/Icon.astro';
+import type { IconName } from '../ui/icons';
+
+interface Tab { id: string; label: string; count: number; icon?: IconName }
+interface Props {
+  tabs: Tab[];
+  active: string;
+  label: string;
+  class?: string;
+  style?: string;
+}
+const { tabs, active, label, class: cls, style } = Astro.props;
+---
+<div class:list={['tabs', cls]} style={style} role="group" aria-label={label}>
+  {tabs.map((t) => (
+    <button type="button" class="tab" data-tab={t.id} aria-pressed={String(t.id === active)}>
+      {t.icon && <Icon name={t.icon} />}
+      {t.label}
+      <span class="tab__count num" data-count-for={t.id}>{t.count}</span>
+    </button>
+  ))}
+</div>
+
+<style>
+  .tabs {
+    display: inline-flex; gap: 2px;
+    padding: 4px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+  }
+  .tab {
+    display: flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 16px;
+    border: 0; border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--text-muted);
+    font: 600 14px var(--font-sans);
+    transition: background var(--dur-3) var(--ease), color var(--dur-2) var(--ease);
+  }
+  .tab:hover { color: var(--text-strong); }
+  .tab[aria-pressed='true'] { background: var(--surface-raised); color: var(--text-strong); }
+  .tab__count {
+    min-width: 20px; padding: 0 6px;
+    border-radius: var(--radius-pill);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 12px; line-height: 20px;
+    text-align: center;
+  }
+</style>

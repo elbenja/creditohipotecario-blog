@@ -1,0 +1,18 @@
+---
+// Kicker above a page title: yellow dot + uppercase label.
+interface Props { class?: string }
+const { class: cls } = Astro.props;
+---
+<p class:list={['eyebrow', cls]}><i aria-hidden="true"></i><slot /></p>
+
+<style>
+  .eyebrow {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 18px;
+    font: 600 12px var(--font-sans);
+    letter-spacing: var(--ls-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  i { width: 6px; height: 6px; border-radius: var(--radius-pill); background: var(--accent); }
+</style>

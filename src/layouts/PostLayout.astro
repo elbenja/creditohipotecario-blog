@@ -1,0 +1,62 @@
+---
+// Article page: hero, body + sticky table of contents, reading progress, "Sigue leyendo".
+import type { MarkdownHeading } from 'astro';
+import type { Post } from '../lib/posts';
+import Container from '../components/layout/Container.astro';
+import PostCard from '../components/blog/PostCard.astro';
+import PostHero from '../components/blog/PostHero.astro';
+import ReadingProgress from '../components/blog/ReadingProgress.astro';
+import TableOfContents from '../components/blog/TableOfContents.astro';
+import Label from '../components/ui/Label.astro';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+  next: Post[];
+}
+const { post, headings, next } = Astro.props;
+---
+<BaseLayout title={post.data.title} description={post.data.excerpt} image={post.data.cover.src}>
+  <ReadingProgress slot="nav-bottom" target="articulo" />
+  <main class="post">
+    <Container>
+      <PostHero post={post} />
+
+      <div class="layout">
+        <article id="articulo" class="prose"><slot /></article>
+        <aside class="side"><TableOfContents headings={headings} /></aside>
+      </div>
+
+      {next.length > 0 && (
+        <section class="next">
+          <Label as="h2" size={12} class="next__title">Sigue leyendo</Label>
+          <div class="next__list">
+            {next.map((p) => <PostCard post={p} headingLevel="h3" />)}
+          </div>
+        </section>
+      )}
+    </Container>
+  </main>
+</BaseLayout>
+
+<style>
+  .post { flex: 1; padding: 24px 0 96px; }
+  .layout {
+    display: grid; grid-template-columns: minmax(0, 720px) minmax(0, 260px); justify-content: space-between;
+    gap: 48px 56px;
+    margin-top: 56px; padding: 0 48px;
+    animation: rise .8s var(--ease) 220ms both;
+  }
+  .side { align-self: start; }
+  .next { margin-top: 88px; padding: 0 48px; }
+  .next :global(.next__title) { margin: 0 0 20px; }
+  .next__list { display: grid; gap: 20px; }
+
+  @media (min-width: 981px) { .side { position: sticky; top: 96px; } }
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: minmax(0, 1fr); padding: 0 8px; margin-top: 40px; }
+    .side { order: -1; }
+    .next { padding: 0 8px; }
+  }
+</style>

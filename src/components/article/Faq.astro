@@ -1,0 +1,25 @@
+---
+// Accordion of <FaqItem>s. One open at a time.
+---
+<div class="faq" data-faq data-reveal data-stagger><slot /></div>
+
+<style>
+  .faq { display: grid; gap: 10px; margin: 28px 0; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-faq]').forEach((faq) => {
+    const items = Array.from(faq.querySelectorAll<HTMLElement>('.qa'));
+    items.forEach((item) => {
+      const btn = item.querySelector<HTMLButtonElement>('.qa__btn');
+      btn?.addEventListener('click', () => {
+        const willOpen = !item.classList.contains('is-open');
+        items.forEach((it) => {
+          const on = it === item && willOpen;
+          it.classList.toggle('is-open', on);
+          it.querySelector('.qa__btn')?.setAttribute('aria-expanded', String(on));
+        });
+      });
+    });
+  });
+</script>

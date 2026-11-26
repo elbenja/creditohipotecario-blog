@@ -1,0 +1,86 @@
+---
+// Guide list with "Todas / Guardadas" filter.
+// Todas: newest guide as a featured card, the rest as rows.
+// Guardadas: every saved guide as a row (client-side, from localStorage). ?tab=guardadas opens it.
+import type { Post } from '../../lib/posts';
+import Button from '../ui/Button.astro';
+import EmptyState from '../ui/EmptyState.astro';
+import FeaturedPostCard from './FeaturedPostCard.astro';
+import FilterTabs from './FilterTabs.astro';
+import PostCard from './PostCard.astro';
+
+interface Props { posts: Post[] }
+const { posts } = Astro.props;
+const [featured, ...rest] = posts;
+---
+<div class="post-index" data-post-index>
+  <FilterTabs
+    class="post-index__tabs rise"
+    style="--delay:180ms"
+    label="Filtrar guías"
+    active="todas"
+    tabs={[
+      { id: 'todas', label: 'Todas', count: posts.length },
+      { id: 'guardadas', label: 'Guardadas', count: 0, icon: 'bookmark' },
+    ]}
+  />
+
+  <div class="list" data-panel="todas">
+    {featured && <FeaturedPostCard post={featured} />}
+    {rest.map((p, i) => <PostCard post={p} index={i + 1} />)}
+  </div>
+
+  <div class="list" data-panel="guardadas" hidden>
+    {posts.map((p, i) => <PostCard post={p} index={i} data-slug={p.id} hidden />)}
+    <EmptyState
+      icon="bookmark"
+      title="Aún no guardas ninguna guía"
+      description="Toca el marcador de una guía para leerla después."
+      data-empty
+    >
+      <Button variant="secondary" data-tab="todas">Ver todas las guías</Button>
+    </EmptyState>
+  </div>
+</div>
+
+<style>
+  .post-index :global(.post-index__tabs) { margin: 40px 0 24px; }
+  .list { display: grid; gap: 20px; }
+</style>
+
+<script>
+  import { getSaved, onSavedChange } from '../../scripts/saved';
+
+  const root = document.querySelector<HTMLElement>('[data-post-index]');
+  if (root) {
+    const tabs = root.querySelectorAll<HTMLButtonElement>('.tab[data-tab]');
+    const panels = root.querySelectorAll<HTMLElement>('[data-panel]');
+    const savedCards = root.querySelectorAll<HTMLElement>('[data-panel="guardadas"] [data-slug]');
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    const savedCount = root.querySelector<HTMLElement>('[data-count-for="guardadas"]');
+
+    const select = (id: string, updateUrl = true) => {
+      tabs.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.tab === id)));
+      panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
+      if (updateUrl) {
+        const url = new URL(location.href);
+        if (id === 'todas') url.searchParams.delete('tab');
+        else url.searchParams.set('tab', id);
+        history.replaceState(null, '', url);
+      }
+    };
+
+    const sync = (list: string[]) => {
+      savedCards.forEach((c) => (c.hidden = !list.includes(c.dataset.slug!)));
+      if (empty) empty.hidden = list.length > 0;
+      if (savedCount) savedCount.textContent = String(list.length);
+    };
+
+    root.querySelectorAll<HTMLElement>('[data-tab]').forEach((b) =>
+      b.addEventListener('click', () => select(b.dataset.tab!)),
+    );
+    sync(getSaved());
+    onSavedChange(sync);
+    if (new URLSearchParams(location.search).get('tab') === 'guardadas') select('guardadas', false);
+  }
+</script>

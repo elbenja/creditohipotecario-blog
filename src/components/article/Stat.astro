@@ -1,0 +1,34 @@
+---
+// One figure inside <Stats>. `unit` renders small after the value.
+// count/dec animate the number; fill makes it white → yellow on scroll.
+interface Props {
+  value: string;
+  label: string;
+  unit?: string;
+  count?: number;
+  dec?: number;
+  fill?: boolean;
+}
+const { value, label, unit, count, dec, fill = false } = Astro.props;
+---
+<li class="stat">
+  <b class="stat__value">
+    <span class:list={{ 'fill-num': fill }} data-count={count} data-dec={dec} set:html={value} />
+    {unit && <small set:html={unit} />}
+  </b>
+  <span class="stat__label">{label}</span>
+</li>
+
+<style>
+  .stat { display: flex; flex-direction: column; gap: 10px; padding: 22px 20px; background: var(--surface); transition: background var(--dur-3) var(--ease); }
+  .stat:hover { background: var(--surface-hover); }
+  .stat__value {
+    font: 800 clamp(28px, 3.4vw, 36px)/1 var(--font-display);
+    letter-spacing: -.03em;
+    color: var(--text-heading);
+    white-space: nowrap;
+  }
+  .stat__value span { display: inline-block; }
+  small { margin-left: 5px; font-size: .5em; font-weight: 700; letter-spacing: 0; color: var(--text); }
+  .stat__label { font-size: 13px; line-height: 1.4; color: var(--text-muted); }
+</style>

@@ -1,0 +1,21 @@
+---
+// Frosted category capsule, readable on top of photos and on plain surfaces.
+interface Props { class?: string }
+const { class: cls } = Astro.props;
+---
+<span class:list={['badge', cls]}><slot /></span>
+
+<style>
+  .badge {
+    display: inline-flex; align-items: center;
+    height: 26px; padding: 0 11px;
+    border-radius: var(--radius-pill);
+    background: rgba(2,6,23,.62);
+    border: 1px solid rgba(255,255,255,.18);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: var(--text-strong);
+    font: 600 12px var(--font-sans);
+    white-space: nowrap;
+  }
+</style>

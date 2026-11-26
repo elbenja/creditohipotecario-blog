@@ -1,0 +1,45 @@
+---
+// Closing call-to-action block. Two shapes:
+//  - title + text:                 <Callout title="¿Ya te entregaron tu depa?">…</Callout>
+//  - tag + copyable quote + text:  <Callout tag="La pregunta" quote="…" copyLabel="Copiar pregunta">…</Callout>
+import CopyButton from '../ui/CopyButton.astro';
+import Label from '../ui/Label.astro';
+import Panel from './Panel.astro';
+
+interface Props {
+  title?: string;
+  tag?: string;
+  quote?: string;
+  copyLabel?: string;
+  copiedLabel?: string;
+  copiedToast?: string;
+}
+const { title, tag, quote, copyLabel = 'Copiar', copiedLabel = 'Copiada', copiedToast = 'Copiado' } = Astro.props;
+---
+<Panel class:list={['callout', { 'callout--quote': quote }]} pad="lg" reveal>
+  {tag && <Label class="callout__tag">{tag}</Label>}
+  {title && <h3 class="callout__title">{title}</h3>}
+  {quote && (
+    <>
+      <blockquote>«{quote}»</blockquote>
+      <CopyButton class="callout__copy" text={quote} label={copyLabel} doneLabel={copiedLabel} toast={copiedToast} />
+    </>
+  )}
+  <div class="callout__text block-text"><slot /></div>
+</Panel>
+
+<style>
+  :global(.callout) { margin: 56px 0 0; }
+  :global(.callout--quote) { margin-top: 28px; }
+  :global(.callout) :global(.callout__tag) { display: block; margin-bottom: 8px; }
+  .callout__title { margin: 0 0 10px; font: 700 22px/1.25 var(--font-display); letter-spacing: -.02em; color: var(--text-heading); }
+  blockquote {
+    margin: 6px 0 20px;
+    font: 700 clamp(21px, 2.6vw, 27px)/1.3 var(--font-display);
+    letter-spacing: -.02em;
+    color: var(--text-heading);
+    text-wrap: balance;
+  }
+  :global(.callout) :global(.callout__copy) { margin-bottom: 22px; }
+  :global(.prose) .callout__text :global(p) { font-size: 17px; }
+</style>

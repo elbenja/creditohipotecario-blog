@@ -1,0 +1,41 @@
+---
+// Things to ask for or confirm. Write a normal markdown list inside:
+//   <Checklist>
+//
+//   - El **precio anual**.
+//
+//   </Checklist>
+---
+<div class="checks" data-reveal><slot /></div>
+
+<style>
+  .checks {
+    margin: 20px 0 16px;
+    padding: 4px 24px;
+    border-radius: var(--radius-item);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .checks :global(ul) { list-style: none; margin: 0; padding: 0; }
+  .checks :global(li) {
+    position: relative;
+    padding: 16px 0 16px 40px;
+    border-top: 1px solid var(--line);
+    font-size: 16.5px; line-height: 1.65;
+    color: var(--text);
+  }
+  .checks :global(li:first-child) { border-top: 0; }
+  .checks :global(li)::before {
+    content: ''; position: absolute; left: 0; top: 17px;
+    width: 24px; height: 24px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line-strong);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f8fafc' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 13px no-repeat;
+    transition: background-color var(--dur-3) var(--ease), border-color var(--dur-3) var(--ease);
+  }
+  .checks :global(li:hover)::before { border-color: var(--text-muted); background-color: var(--surface-raised); }
+  .checks :global(li p) { margin: 0; font-size: inherit; line-height: inherit; }
+  @media (max-width: 820px) {
+    .checks { padding: 4px 20px; }
+  }
+</style>

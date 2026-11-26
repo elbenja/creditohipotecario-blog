@@ -1,0 +1,252 @@
+---
+// Sticky site nav: logo with a sites menu, main links, account actions,
+// and a hamburger panel on mobile (≤960px). Links live in config/site.ts.
+// Anything passed in the default slot renders along the nav's bottom edge (e.g. ReadingProgress).
+import { ACCOUNT_LINKS, NAV_LINKS, SITE, SITES } from '../../config/site';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  /** key of the NAV_LINKS entry for the current section */
+  current?: string;
+}
+const { current = 'blog' } = Astro.props;
+---
+<header class="nav" data-nav>
+  <div class="nav__in">
+    <div class="sites" data-sites>
+      <button type="button" class="trigger" aria-expanded="false" aria-controls="nav-sites" aria-label={`${SITE.wordmark}, menú de sitios`} data-menu-toggle="sites">
+        <img src="/assets/logo-mark.svg" alt="" width="24" height="23" />
+        <span class="wordmark">{SITE.wordmark}</span>
+        <Icon name="chevron-down" class="trigger__chev" />
+      </button>
+      <nav id="nav-sites" class="dropdown" aria-label={`Sitios de ${SITE.name}`} data-menu="sites">
+        {SITES.map((s, i) => (
+          <a href={s.href} class:list={['site', { 'is-current': s.current }]} style={`--i:${i}`} aria-current={s.current ? 'page' : undefined}>
+            <span class="site__icon"><Icon name={s.icon === 'home' ? 'house' : 'trend'} size={24} /></span>
+            <span class="site__text">
+              <span class="site__title">{s.title}</span>
+              <span class="site__sub">{s.subtitle}</span>
+            </span>
+            {s.current && <span class="site__check"><Icon name="check-bold" size={20} /></span>}
+          </a>
+        ))}
+      </nav>
+    </div>
+
+    <nav class="links" aria-label="Principal">
+      {NAV_LINKS.map((l, i) => {
+        const isCur = 'key' in l && l.key === current;
+        return (
+          <a href={l.href} class:list={['link', { 'is-current': isCur }]} style={`--delay:${60 + i * 40}ms`} aria-current={isCur ? 'page' : undefined}>
+            {'icon' in l && <Icon name="users" size={16} />}{l.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <div class="actions">
+      <Button href={ACCOUNT_LINKS.signIn.href} variant="secondary" size="sm" class="nav-in" style="--delay:120ms">{ACCOUNT_LINKS.signIn.label}</Button>
+      <Button href={ACCOUNT_LINKS.signUp.href} variant="primary" size="sm" arrow class="nav-in" style="--delay:180ms">{ACCOUNT_LINKS.signUp.label}</Button>
+    </div>
+
+    <button type="button" class="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-app" data-menu-toggle="app"><span></span><span></span><span></span></button>
+    <nav id="nav-app" class="panel" aria-label="Menú" data-menu="app">
+      {NAV_LINKS.map((l, i) => {
+        const isCur = 'key' in l && l.key === current;
+        return <a href={l.href} class:list={['mrow', { 'is-current': isCur }]} style={`--i:${i}`} aria-current={isCur ? 'page' : undefined}>{l.label}</a>;
+      })}
+      <a href={ACCOUNT_LINKS.signIn.href} class="mrow mrow--strong" style={`--i:${NAV_LINKS.length}`}>{ACCOUNT_LINKS.signIn.mobileLabel}</a>
+      <Button href={ACCOUNT_LINKS.signUp.href} size="lg" block class="mcta">{ACCOUNT_LINKS.signUp.label}</Button>
+    </nav>
+    <button type="button" class="scrim" aria-label="Cerrar menú" tabindex="-1" data-menu-close></button>
+  </div>
+  <slot />
+</header>
+
+<style>
+  .nav { position: sticky; top: 0; z-index: 50; background: var(--surface-nav); color: #fff; border-bottom: 1px solid var(--line); }
+  .nav__in { position: relative; display: flex; align-items: center; gap: 32px; padding: 13px 32px; }
+  @keyframes navIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .link, .nav :global(.nav-in) { animation: navIn 360ms var(--ease) var(--delay, 0ms) both; }
+
+  /* Logo + sites menu */
+  .sites { position: relative; flex-shrink: 0; }
+  .trigger {
+    display: flex; align-items: center; gap: 9px;
+    height: 44px; margin-left: -10px; padding: 0 10px;
+    border: 0; border-radius: var(--radius-lg);
+    background: transparent; color: inherit;
+    transition: background-color var(--dur-2) ease, transform 140ms ease;
+  }
+  .trigger:hover, .trigger[aria-expanded='true'] { background: var(--surface); }
+  .trigger:active { transform: scale(.97); }
+  .trigger img { display: block; transition: transform 320ms cubic-bezier(.3,1.4,.5,1); }
+  .trigger:hover img { transform: rotate(-8deg); }
+  .wordmark { font: 800 17px var(--font-display); letter-spacing: -.02em; }
+  .trigger :global(.trigger__chev) { margin-left: 2px; transition: transform 260ms cubic-bezier(.3,1.3,.5,1); }
+  .trigger:hover :global(.trigger__chev) { transform: translateY(2px); }
+  .trigger[aria-expanded='true'] :global(.trigger__chev) { transform: rotate(180deg); }
+
+  .dropdown {
+    position: absolute; top: calc(100% + 8px); left: -10px; z-index: 20;
+    width: 412px; padding: 12px;
+    border-radius: var(--radius-card);
+    background: var(--surface-menu);
+    box-shadow: 0 0 0 1px var(--line), 0 24px 48px -12px rgba(0,0,0,.6);
+    opacity: 0; visibility: hidden;
+    transform: translateY(-6px) scale(.98); transform-origin: 12% 0;
+    transition: opacity 160ms ease, transform 220ms var(--ease), visibility 0s linear 220ms;
+  }
+  .dropdown.is-open { opacity: 1; visibility: visible; transform: none; transition: opacity 160ms ease, transform 280ms var(--ease), visibility 0s; }
+  .site {
+    display: flex; align-items: center; gap: 20px;
+    min-height: 60px; padding: 9px 16px;
+    border-radius: 14px;
+    color: #fff; text-decoration: none;
+    opacity: 0; transform: translateY(-4px);
+    transition: background-color 160ms ease, opacity 200ms ease calc(var(--i) * 30ms), transform 260ms var(--ease) calc(var(--i) * 30ms);
+  }
+  .dropdown.is-open .site { opacity: 1; transform: none; }
+  .site:hover { background: var(--surface); }
+  .site.is-current { background: var(--surface-raised); }
+  .site:active { transform: scale(.985); }
+  .site__icon { flex-shrink: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+  .site__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+  .site__title { font: 600 16px/22px var(--font-sans); }
+  .site__sub { font: 400 14px/20px var(--font-sans); color: var(--text-muted); }
+  .site__check { flex-shrink: 0; display: flex; transform: scale(0); transition: transform 320ms cubic-bezier(.3,1.6,.5,1) 140ms; }
+  .dropdown.is-open .site__check { transform: scale(1); }
+
+  /* Main links */
+  .links { display: flex; align-items: center; gap: 26px; }
+  .link {
+    position: relative;
+    display: flex; align-items: center; gap: 6px;
+    height: 44px; padding: 0 2px;
+    font: 500 14px var(--font-sans);
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: color var(--dur-2) ease;
+  }
+  .link:hover, .link.is-current { color: #fff; }
+  .link::after {
+    content: ''; position: absolute; left: 2px; right: 2px; bottom: 8px;
+    height: 2px; border-radius: 2px;
+    background: var(--text-strong);
+    transform: scaleX(0);
+    transition: transform 220ms var(--ease);
+  }
+  .link:hover::after, .link.is-current::after { transform: scaleX(1); }
+  .actions { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+  /* Mobile only */
+  .burger, .panel, .scrim { display: none; }
+  .burger {
+    position: relative; width: 36px; height: 36px;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: transparent; color: #fff;
+    transition: background-color 160ms ease, transform 140ms ease;
+  }
+  .burger:active { transform: scale(.95); }
+  .burger[aria-expanded='true'] { background: var(--surface); }
+  .burger span {
+    position: absolute; left: 8px; width: 18px; height: 2px;
+    border-radius: 2px; background: currentColor;
+    transition: transform 300ms cubic-bezier(.3,1.3,.5,1), opacity 160ms ease;
+  }
+  .burger span:nth-child(1) { top: 11px; }
+  .burger span:nth-child(2) { top: 16px; }
+  .burger span:nth-child(3) { top: 21px; }
+  .burger[aria-expanded='true'] span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+  .burger[aria-expanded='true'] span:nth-child(2) { opacity: 0; transform: scaleX(.2); }
+  .burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+  .mrow {
+    display: flex; align-items: center; gap: 10px;
+    height: 43px; margin-bottom: 4px; padding: 0 4px;
+    border-radius: var(--radius);
+    font: 500 15px var(--font-sans);
+    color: #fff; text-decoration: none;
+    opacity: 0; transform: translateY(-4px);
+    transition: background-color 160ms ease, opacity 200ms ease calc(var(--i) * 30ms), transform 260ms var(--ease) calc(var(--i) * 30ms);
+  }
+  .mrow:active, .mrow.is-current { background: var(--surface); }
+  .mrow--strong { font-weight: 600; }
+  .panel.is-open .mrow { opacity: 1; transform: none; }
+  .panel :global(.mcta) { margin-top: 5px; opacity: 0; transform: translateY(-4px); transition: opacity 200ms ease 150ms, transform 260ms var(--ease) 150ms; }
+  .panel.is-open :global(.mcta) { opacity: 1; transform: none; }
+
+  @media (max-width: 960px) {
+    .nav__in { justify-content: space-between; gap: 12px; height: 68px; padding: 0 24px; }
+    .links, .actions { display: none; }
+    .sites { position: static; }
+    .trigger { margin-left: -8px; padding: 0 8px; }
+    .trigger:hover img, .trigger:hover :global(.trigger__chev) { transform: none; }
+    .trigger[aria-expanded='true'] :global(.trigger__chev) { transform: rotate(180deg); }
+    .burger { display: block; }
+    .dropdown, .panel {
+      position: absolute; top: calc(100% + 1px); left: 0; right: 0; z-index: 20;
+      width: auto;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+      background: var(--surface-menu);
+      box-shadow: 0 1px 0 var(--line), 0 24px 40px -16px rgba(0,0,0,.6);
+      transform: translateY(-12px);
+    }
+    .dropdown { padding: 12px 12px 16px; }
+    .dropdown.is-open { transform: none; }
+    .panel {
+      display: block; padding: 8px 24px 20px;
+      opacity: 0; visibility: hidden;
+      transition: opacity 180ms ease, transform 260ms var(--ease), visibility 0s linear 260ms;
+    }
+    .panel.is-open { opacity: 1; visibility: visible; transform: none; transition: opacity 180ms ease, transform 320ms var(--ease), visibility 0s; }
+    .site:hover { background: transparent; }
+    .site.is-current { background: var(--surface-raised); }
+    .scrim {
+      display: block; position: fixed; top: 69px; left: 0; right: 0; bottom: 0; z-index: 10;
+      border: 0; padding: 0;
+      background: rgba(0,0,0,.6);
+      opacity: 0; visibility: hidden;
+      transition: opacity 220ms ease, visibility 0s linear 220ms;
+    }
+    .scrim.is-open { opacity: 1; visibility: visible; transition: opacity 220ms ease, visibility 0s; }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  if (nav) {
+    const toggles = nav.querySelectorAll<HTMLButtonElement>('[data-menu-toggle]');
+    const menus = nav.querySelectorAll<HTMLElement>('[data-menu]');
+    const scrim = nav.querySelector<HTMLElement>('[data-menu-close]');
+    const sites = nav.querySelector<HTMLElement>('[data-sites]');
+    let open: string | null = null;
+    let leaveTimer = 0;
+
+    const set = (name: string | null) => {
+      open = name;
+      menus.forEach((m) => m.classList.toggle('is-open', m.dataset.menu === name));
+      toggles.forEach((t) => {
+        const on = t.dataset.menuToggle === name;
+        t.setAttribute('aria-expanded', String(on));
+        if (t.dataset.menuToggle === 'app') t.setAttribute('aria-label', on ? 'Cerrar menú' : 'Abrir menú');
+      });
+      scrim?.classList.toggle('is-open', !!name);
+    };
+
+    toggles.forEach((t) =>
+      t.addEventListener('click', () => {
+        clearTimeout(leaveTimer);
+        set(open === t.dataset.menuToggle ? null : t.dataset.menuToggle!);
+      }),
+    );
+    scrim?.addEventListener('click', () => set(null));
+    nav.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) set(null); });
+    document.addEventListener('click', (e) => { if (open && !nav.contains(e.target as Node)) set(null); });
+
+    // Desktop: the sites menu also opens on hover.
+    const canHover = () => window.matchMedia('(hover: hover) and (min-width: 961px)').matches;
+    sites?.addEventListener('mouseenter', () => { if (!canHover()) return; clearTimeout(leaveTimer); set('sites'); });
+    sites?.addEventListener('mouseleave', () => { if (!canHover()) return; clearTimeout(leaveTimer); leaveTimer = window.setTimeout(() => set(null), 160); });
+  }
+</script>

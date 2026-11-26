@@ -1,0 +1,14 @@
+---
+// Opening paragraph. variant="dek" is the slightly larger, brighter subtitle style.
+interface Props { variant?: 'lead' | 'dek' }
+const { variant = 'lead' } = Astro.props;
+---
+<p class:list={['lead', `lead--${variant}`]}><slot /></p>
+
+<style>
+  :global(.prose) .lead--lead { font-size: 21px; line-height: 1.65; color: var(--text-soft); }
+  :global(.prose) .lead--dek { font-size: 22px; line-height: 1.5; color: var(--slate-100); margin-bottom: 28px; }
+  @media (max-width: 820px) {
+    :global(.prose) .lead--lead { font-size: 19px; }
+  }
+</style>

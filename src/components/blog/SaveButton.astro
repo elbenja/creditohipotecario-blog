@@ -1,0 +1,84 @@
+---
+// Bookmark toggle for a guide. Every SaveButton with the same slug stays in sync
+// (localStorage + `saved:change`). `round` = icon-only over a card photo; otherwise
+// a wide pill with "Guardar / Guardada" text (article hero).
+import GlassButton from '../ui/GlassButton.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  slug: string;
+  title: string;
+  round?: boolean;
+  class?: string;
+}
+const { slug, title, round = false, class: cls } = Astro.props;
+---
+<GlassButton
+  round={round}
+  class:list={['save', { 'save--wide': !round }, cls]}
+  data-save={slug}
+  data-title={title}
+  aria-pressed="false"
+  aria-label={round ? `Guardar para después: ${title}` : undefined}
+>
+  <Icon name="bookmark" class="save__off" />
+  <Icon name="bookmark-fill" class="save__on" />
+  {!round && <span class="save__text">Guardar</span>}
+</GlassButton>
+
+<style>
+  .save :global(.save__on) { display: none; color: var(--accent); }
+  .save[aria-pressed='true'] :global(.save__off) { display: none; }
+  .save[aria-pressed='true'] :global(.save__on) { display: inline-block; }
+  .save:global(.is-just) :global(.save__on) { animation: pop .32s var(--ease); }
+  .save:global(.is-just)::after {
+    content: ''; position: absolute; inset: -1px;
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--accent);
+    pointer-events: none;
+    animation: ring .6s ease-out both;
+  }
+  .save--wide { padding: 0 16px 0 13px; }
+</style>
+
+<script>
+  import { getSaved, toggleSaved, onSavedChange } from '../../scripts/saved';
+  import { showToast } from '../../scripts/toast';
+
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-save]'));
+
+  function paint(list: string[]) {
+    for (const b of buttons) {
+      const on = list.includes(b.dataset.save!);
+      b.setAttribute('aria-pressed', String(on));
+      const title = b.dataset.title;
+      if (b.hasAttribute('aria-label')) {
+        b.setAttribute('aria-label', (on ? 'Quitar de guardadas: ' : 'Guardar para después: ') + title);
+      }
+      const text = b.querySelector('.save__text');
+      if (text) text.textContent = on ? 'Guardada' : 'Guardar';
+    }
+  }
+
+  for (const b of buttons) {
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const slug = b.dataset.save!;
+      const on = toggleSaved(slug);
+      buttons
+        .filter((x) => x.dataset.save === slug)
+        .forEach((x) => {
+          x.classList.remove('is-just');
+          if (on) { void x.offsetWidth; x.classList.add('is-just'); }
+        });
+      showToast(
+        on
+          ? { message: 'Guardada para leer después', icon: 'bookmark-fill', action: { label: 'Ver guardadas', href: '/blog?tab=guardadas' } }
+          : { message: 'Quitada de tus guardadas', icon: 'bookmark-fill' },
+      );
+    });
+  }
+
+  paint(getSaved());
+  onSavedChange(paint);
+</script>

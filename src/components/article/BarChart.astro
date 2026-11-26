@@ -1,0 +1,46 @@
+---
+// Accessible table rendered as horizontal bars. Bars grow when the chart scrolls in.
+import Panel from './Panel.astro';
+import Legend, { type LegendItem } from './Legend.astro';
+
+export interface BarRow { label: string; value: string; percent: number; tone?: 'base' | 'accent' }
+interface Props {
+  labelHeading: string;
+  valueHeading: string;
+  rows: BarRow[];
+  legend?: LegendItem[];
+}
+const { labelHeading, valueHeading, rows, legend } = Astro.props;
+---
+<Panel as="figure" class="chart" reveal>
+  <table>
+    <thead><tr><th scope="col">{labelHeading}</th><th scope="col" class="r">{valueHeading}</th></tr></thead>
+    <tbody>
+      {rows.map((r, i) => (
+        <tr>
+          <th scope="row">
+            {r.label}
+            <span class="bar" aria-hidden="true">
+              <i class:list={{ accent: r.tone === 'accent' }} style={`width:${r.percent}%;transition-delay:${i * 0.12}s`}></i>
+            </span>
+          </th>
+          <td class="num">{r.value}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  {legend && <Legend items={legend} />}
+</Panel>
+
+<style>
+  :global(.chart) { margin: 28px 0; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 0 0 14px; font: 600 11px var(--font-sans); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--text-muted); text-align: left; }
+  thead th.r, td { text-align: right; }
+  tbody th { padding: 16px 20px 16px 0; border-top: 1px solid var(--line); font: 500 16px/1.4 var(--font-sans); color: var(--text-soft); text-align: left; }
+  td { padding: 14px 0 0; border-top: 1px solid var(--line); vertical-align: top; white-space: nowrap; font: 700 22px var(--font-display); color: var(--text-heading); }
+  .bar { display: block; height: 8px; margin-top: 12px; border-radius: var(--radius-pill); background: var(--line); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--text-muted); transform-origin: left; transition: transform 1.1s var(--ease); }
+  .bar i.accent { background: var(--accent); }
+  :global(.js-reveal) :global(.chart:not([data-in])) .bar i { transform: scaleX(0); }
+</style>

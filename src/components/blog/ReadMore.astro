@@ -1,0 +1,22 @@
+---
+// Decorative "→ Leer guía" affordance. Cards fill the circle on hover via `.card:hover`.
+import Icon from '../ui/Icon.astro';
+
+interface Props { label?: string; class?: string }
+const { label = 'Leer guía', class: cls } = Astro.props;
+---
+<span class:list={['more', cls]} aria-hidden="true"><b><Icon name="arrow" size={16} class="more__icon" /></b>{label}</span>
+
+<style>
+  .more { display: inline-flex; align-items: center; gap: 10px; font: 600 14px var(--font-sans); color: var(--text-strong); }
+  b {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(255,255,255,.28);
+    transition: background var(--dur-3) var(--ease), color var(--dur-3) var(--ease), border-color var(--dur-3) var(--ease);
+  }
+  .more :global(.more__icon) { transition: transform var(--dur-3) var(--ease); }
+  :global(.card:hover) b { background: var(--text-strong); border-color: var(--text-strong); color: var(--bg); }
+  :global(.card:hover) .more :global(.more__icon) { transform: translateX(3px); }
+</style>

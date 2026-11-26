@@ -1,0 +1,34 @@
+---
+// Photo layer with a shimmering placeholder and a slow zoom-in on load.
+// `position` sets object-position; `eager` for above-the-fold images.
+interface Props {
+  src: string;
+  alt: string;
+  position?: string;
+  eager?: boolean;
+  class?: string;
+}
+const { src, alt, position, eager = false, class: cls } = Astro.props;
+---
+<div class:list={['media', cls]}>
+  <img
+    src={src}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    style={position ? `object-position:${position}` : undefined}
+  />
+</div>
+
+<style>
+  .media {
+    overflow: hidden;
+    background: linear-gradient(100deg, var(--slate-900) 30%, var(--slate-800) 50%, var(--slate-900) 70%) 0 0 / 200% 100%;
+  }
+  img {
+    display: block; width: 100%; height: 100%;
+    object-fit: cover;
+    animation: imgin 1.1s var(--ease) both;
+    transition: transform .9s var(--ease);
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+// Single live region for toasts. Trigger with showToast() from scripts/toast.ts.
+---
+<div class="toasts" role="status" aria-live="polite" data-toaster></div>
+
+<style>
+  .toasts {
+    position: fixed; left: 0; right: 0; bottom: 24px; z-index: 70;
+    display: flex; justify-content: center;
+    padding: 0 16px;
+    pointer-events: none;
+  }
+  .toasts :global(.toast) {
+    display: flex; align-items: center; gap: 12px;
+    min-height: 48px;
+    padding: 6px 16px;
+    border-radius: var(--radius-pill);
+    background: var(--text-strong);
+    color: var(--bg);
+    font: 500 14px var(--font-sans);
+    box-shadow: var(--shadow-float);
+    pointer-events: auto;
+    animation: toastin .32s var(--ease) both;
+  }
+  .toasts :global(.toast--action) { padding-right: 8px; }
+  .toasts :global(.toast .ic) { --ic-size: 16px; }
+  .toasts :global(.toast a) {
+    display: inline-flex; align-items: center;
+    height: 36px; padding: 0 14px;
+    border-radius: var(--radius-pill);
+    background: var(--bg);
+    color: var(--text-strong);
+    font: 600 13px var(--font-sans);
+    text-decoration: none;
+  }
+</style>
+
+<script>
+  import type { ToastOptions } from '../../scripts/toast';
+
+  const host = document.querySelector<HTMLElement>('[data-toaster]');
+  let timer = 0;
+
+  window.addEventListener('toast:show', (e) => {
+    if (!host) return;
+    const { message, icon = 'bookmark-fill', action } = (e as CustomEvent<ToastOptions>).detail;
+    const el = document.createElement('div');
+    el.className = 'toast' + (action ? ' toast--action' : '');
+    const ic = document.createElement('i');
+    ic.className = `ic ic-${icon}`;
+    ic.setAttribute('aria-hidden', 'true');
+    const text = document.createElement('span');
+    text.textContent = message;
+    el.append(ic, text);
+    if (action) {
+      const a = document.createElement('a');
+      a.href = action.href;
+      a.textContent = action.label;
+      el.append(a);
+    }
+    host.replaceChildren(el);
+    clearTimeout(timer);
+    timer = window.setTimeout(() => host.replaceChildren(), 2800);
+  });
+</script>

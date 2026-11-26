@@ -1,0 +1,10 @@
+---
+// Numbered steps (01, 02…). Each child is a <Step>.
+interface Props { stagger?: boolean }
+const { stagger = false } = Astro.props;
+---
+<ol class="steps" data-reveal data-stagger={stagger ? '' : undefined}><slot /></ol>
+
+<style>
+  .steps { list-style: none; display: grid; gap: 12px; margin: 28px 0; padding: 0; counter-reset: step; }
+</style>

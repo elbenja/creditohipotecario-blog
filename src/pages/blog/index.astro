@@ -1,0 +1,35 @@
+---
+import Container from '../../components/layout/Container.astro';
+import PostIndex from '../../components/blog/PostIndex.astro';
+import Eyebrow from '../../components/ui/Eyebrow.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+---
+<BaseLayout title="Blog" description="Estrategias claras de amortización, tasas y financiamiento inmobiliario en Perú.">
+  <main class="index">
+    <Container>
+      <section class="intro">
+        <Eyebrow class="rise">Educación financiera inmobiliaria</Eyebrow>
+        <h1 class="rise" style="--delay:60ms">Guías para pagar menos por tu hipoteca</h1>
+        <p class="sub rise" style="--delay:120ms">Estrategias claras de amortización, tasas y financiamiento inmobiliario en Perú.</p>
+      </section>
+      <PostIndex posts={posts} />
+    </Container>
+  </main>
+</BaseLayout>
+
+<style>
+  .index { flex: 1; padding: 72px 0 96px; }
+  .intro { max-width: 780px; }
+  h1 {
+    margin: 0;
+    font: 800 clamp(34px, 5.2vw, 56px)/1.05 var(--font-display);
+    letter-spacing: -.035em;
+    color: var(--text-heading);
+    text-wrap: balance;
+  }
+  .sub { margin: 20px 0 0; font-size: 18px; line-height: 1.6; color: var(--text); max-width: 560px; }
+  @media (max-width: 820px) { .index { padding: 48px 0 72px; } }
+</style>

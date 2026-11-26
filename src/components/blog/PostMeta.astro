@@ -1,0 +1,32 @@
+---
+// "Categoría · fecha · lectura · autor" line. Category renders as a Badge when given.
+import Badge from '../ui/Badge.astro';
+import { formatDate } from '../../lib/posts';
+
+interface Props {
+  date: Date;
+  readingTime: string;
+  category?: string;
+  author?: string;
+  tone?: 'soft' | 'muted';
+  class?: string;
+}
+const { date, readingTime, category, author, tone = 'soft', class: cls } = Astro.props;
+---
+<p class:list={['meta', 'num', `meta--${tone}`, cls]}>
+  {category && <Badge>{category}</Badge>}
+  <time datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time>
+  <span aria-hidden="true">·</span>
+  <span>{readingTime}</span>
+  {author && <><span aria-hidden="true">·</span><span>Por {author}</span></>}
+</p>
+
+<style>
+  .meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+    margin: 0;
+    font-size: 13px; line-height: 1.4;
+  }
+  .meta--soft { color: var(--text); }
+  .meta--muted { color: var(--text-muted); }
+</style>

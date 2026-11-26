@@ -1,0 +1,19 @@
+---
+// Title link that makes the whole card clickable (its ::after covers the card)
+// and grows an underline when the card is hovered. Parent card needs position:relative.
+interface Props { href: string }
+const { href } = Astro.props;
+---
+<a class="card-link" href={href}><span><slot /></span></a>
+
+<style>
+  .card-link { color: inherit; text-decoration: none; }
+  .card-link::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+  .card-link span {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+    transition: background-size .42s var(--ease);
+  }
+  :global(.card:hover) .card-link span { background-size: 100% 2px; }
+  .card-link:focus-visible { outline: none; }
+  .card-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: -5px; }
+</style>

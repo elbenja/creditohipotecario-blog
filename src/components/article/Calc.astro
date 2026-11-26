@@ -1,0 +1,43 @@
+---
+// Worked example: tag, title, an equation of tiles, then explanation (default slot).
+//   equation: tiles and operators in order, e.g.
+//     [{ value: 'S/ 1.800', label: 'de alquiler al mes' }, '×', { ... }, '=', { ..., result: true }]
+//   fine: small print under the text.
+import Label from '../ui/Label.astro';
+import Panel from './Panel.astro';
+
+export type Term = string | { value: string; label: string; result?: boolean };
+interface Props {
+  tag: string;
+  title: string;
+  equation: Term[];
+  fine?: string;
+}
+const { tag, title, equation, fine } = Astro.props;
+---
+<Panel class="calc" reveal>
+  <Label class="calc__tag">{tag}</Label>
+  <h3 class="calc__title" set:html={title} />
+  <div class="eq num">
+    {equation.map((t) => (typeof t === 'string' ? (
+      <span class="eq__op" aria-hidden="true">{t}</span>
+    ) : (
+      <div class:list={['eq__t', { 'eq__t--res': t.result }]}><b set:html={t.value} /><span>{t.label}</span></div>
+    )))}
+  </div>
+  <div class="block-text"><slot /></div>
+  {fine && <p class="calc__fine">{fine}</p>}
+</Panel>
+
+<style>
+  :global(.calc) { margin: 36px 0; }
+  :global(.calc) :global(.calc__tag) { display: block; margin-bottom: 8px; }
+  .calc__title { margin: 0; font: 700 22px/1.25 var(--font-display); letter-spacing: -.02em; color: var(--text-heading); }
+  .eq { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin: 20px 0; }
+  .eq__t { flex: 1 1 150px; padding: 14px 16px; border-radius: var(--radius-lg); background: var(--bg); border: 1px solid var(--line); }
+  .eq__t b { display: block; font: 700 24px/1.2 var(--font-display); letter-spacing: -.02em; color: var(--text-heading); }
+  .eq__t span { font-size: 13px; color: var(--text-muted); }
+  .eq__t--res { border-color: var(--line-hover); }
+  .eq__op { align-self: center; font: 600 20px var(--font-sans); color: var(--text-muted); }
+  :global(.prose) .calc__fine { margin: 12px 0 0; font-size: 13px; color: var(--text-muted); }
+</style>

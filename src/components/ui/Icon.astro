@@ -1,0 +1,12 @@
+---
+// Mask-based icon: inherits currentColor. Names map to .ic-* classes in styles/icons.css.
+import type { IconName } from './icons';
+
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+}
+const { name, size, class: cls } = Astro.props;
+---
+<i class:list={['ic', `ic-${name}`, cls]} style={size ? `--ic-size:${size}px` : undefined} aria-hidden="true"></i>

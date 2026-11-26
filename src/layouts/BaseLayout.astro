@@ -1,0 +1,54 @@
+---
+// Page shell: <head>, fonts, global styles, nav, footer, toasts and scroll motion.
+// Use the `nav-bottom` slot to attach something to the nav's lower edge.
+import '../styles/global.css';
+import { SITE } from '../config/site';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import SiteNav from '../components/layout/SiteNav.astro';
+import Toaster from '../components/layout/Toaster.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+const { title, description, image } = Astro.props;
+const fullTitle = title === 'Blog' ? `Blog · ${SITE.name}` : `${title} · ${SITE.name}`;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    {image && <meta property="og:image" content={new URL(image, Astro.site)} />}
+    <script is:inline>
+      // Hide [data-reveal] blocks before first paint so they can animate in (see scripts/motion.ts).
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('js-reveal');
+      }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/assets/logo-mark.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="page">
+      <SiteNav current="blog"><slot name="nav-bottom" /></SiteNav>
+      <slot />
+      <SiteFooter />
+    </div>
+    <Toaster />
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>
+
+<style>
+  .page { min-height: 100vh; display: flex; flex-direction: column; }
+</style>

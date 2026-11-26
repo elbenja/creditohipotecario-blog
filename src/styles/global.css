@@ -1,0 +1,77 @@
+@import './tokens.css';
+@import './icons.css';
+@import './prose.css';
+
+/* ── Base ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+button { font-family: inherit; cursor: pointer; }
+img { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+/* ── Utilities ────────────────────────────────────────── */
+.num { font-variant-numeric: tabular-nums; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.label {
+  font: 600 11px var(--font-sans);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+[hidden] { display: none !important; }
+
+/* ── Keyframes (shared) ───────────────────────────────── */
+@keyframes rise   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes imgin  { from { opacity: 0; transform: scale(1.08); } to { opacity: 1; transform: none; } }
+@keyframes pop    { from { transform: scale(.55); } to { transform: none; } }
+@keyframes ring   { from { opacity: .7; transform: scale(.8); } to { opacity: 0; transform: scale(1.9); } }
+@keyframes toastin{ from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* Entrance on page load. Add .rise and optionally a delay (style="--delay:120ms"). */
+.rise { animation: rise .7s var(--ease) var(--delay, 0ms) both; }
+
+/* Reveal on scroll: add data-reveal. data-stagger makes direct children enter one by one.
+   Only active when JS adds .js-reveal to <html> (no JS = everything visible). */
+.js-reveal [data-reveal] { opacity: 0; transform: translateY(18px); }
+.js-reveal [data-reveal][data-in] { opacity: 1; transform: none; transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.js-reveal [data-reveal][data-stagger][data-in] > * { animation: rise .6s var(--ease) backwards; }
+.js-reveal [data-reveal][data-stagger][data-in] > :nth-child(2) { animation-delay: 90ms; }
+.js-reveal [data-reveal][data-stagger][data-in] > :nth-child(3) { animation-delay: 180ms; }
+.js-reveal [data-reveal][data-stagger][data-in] > :nth-child(4) { animation-delay: 270ms; }
+.js-reveal [data-reveal][data-stagger][data-in] > :nth-child(n+5) { animation-delay: 360ms; }
+
+/* Number that fills from white to brand yellow (bottom → top) while scrolling.
+   Add class="fill-num"; motion.ts sets --fill from 0 to 1. */
+.fill-num { --fill: 0; color: var(--accent); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .fill-num {
+    background: linear-gradient(0deg,
+      var(--accent) 0,
+      var(--accent) calc(var(--fill) * 100% - 3%),
+      var(--text-heading) calc(var(--fill) * 100% + 3%),
+      var(--text-heading) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: .01ms !important;
+  }
+}

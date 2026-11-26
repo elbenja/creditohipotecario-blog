@@ -1,0 +1,23 @@
+---
+// Two (or more) options side by side. Write a markdown list inside; each item becomes a card.
+---
+<div class="pair" data-reveal><slot /></div>
+
+<style>
+  .pair :global(ul) {
+    list-style: none;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 12px;
+    margin: 24px 0; padding: 0;
+  }
+  .pair :global(li) {
+    padding: 24px;
+    border-radius: var(--radius-item);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    font-size: 16.5px; line-height: 1.7;
+    transition: border-color var(--dur-3) var(--ease), transform var(--dur-3) var(--ease);
+  }
+  .pair :global(li:hover) { border-color: var(--line-strong); transform: translateY(-3px); }
+  .pair :global(li p) { margin: 0; font-size: inherit; line-height: inherit; }
+</style>
